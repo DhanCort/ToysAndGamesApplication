@@ -16,6 +16,7 @@ namespace ToysAndGames.Models
         [MaxLength(100)]
         public string Description { get; set; }
         [Range(0, 100)]
+        [Display(Name ="Age")]
         public int AgeRestriction { get; set; }
         [Required]
         [MaxLength(50)]

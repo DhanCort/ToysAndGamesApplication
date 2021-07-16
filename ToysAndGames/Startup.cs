@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ToysAndGames.Contracts;
 using ToysAndGames.Data;
+using ToysAndGames.Mappings;
 using ToysAndGames.Repository;
 
 namespace ToysAndGames
@@ -43,16 +44,18 @@ namespace ToysAndGames
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IResponse, ResponseRepository>();
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-
+            // For mapping
+            services.AddAutoMapper(typeof(Maps));
 
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IProductRepository productrepo)
         {
             if (env.IsDevelopment())
             {
@@ -66,6 +69,8 @@ namespace ToysAndGames
             app.UseRouting();
 
             app.UseAuthorization();
+
+            SeedData.Seed(productrepo);
 
             app.UseEndpoints(endpoints =>
             {
