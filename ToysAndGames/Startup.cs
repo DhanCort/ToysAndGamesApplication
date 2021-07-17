@@ -33,6 +33,10 @@ namespace ToysAndGames
         {
 
             services.AddControllers();
+
+            //CORS
+            services.AddCors();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ToysAndGames", Version = "v1" });
@@ -69,6 +73,13 @@ namespace ToysAndGames
             app.UseRouting();
 
             app.UseAuthorization();
+
+            //CORS
+            app.UseCors(builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+            );
 
             SeedData.Seed(productrepo);
 
