@@ -20,15 +20,18 @@ namespace ToysAndGames.Controllers
         private readonly IProductRepository _productRepo;
         private readonly IMapper _mapper;
         private readonly IResponse _response;
+        private readonly IProductTypeRepository _producttyperepo;
 
         public ProductController(
             IProductRepository productRepo,
             IMapper mapper,
-            IResponse response)
+            IResponse response,
+            IProductTypeRepository producttyperepo)
         {
             _productRepo = productRepo;
             _mapper = mapper;
             _response = response;
+            _producttyperepo = producttyperepo;
         }
 
         //-------------------------------------------------------------------------------------------------------------
@@ -45,7 +48,7 @@ namespace ToysAndGames.Controllers
             if (products.Count > 0)
             {
                 //Map to model
-                var productsModel = _mapper.Map<List<ProductDataDictionary>, List<ProductModel>>(products.ToList());
+                var productsModel = _mapper.Map<List<Product>, List<ProductModel>>(products.ToList());
                 //Assign records to response.
                 response.Products = productsModel;
                 response.Message = "Success";
@@ -69,7 +72,7 @@ namespace ToysAndGames.Controllers
             if (product != null)
             {
                 //Map to model
-                var productModel = _mapper.Map<ProductDataDictionary, ProductModel>(product);
+                var productModel = _mapper.Map<Product, ProductModel>(product);
                 response.Products = productModel;
                 response.Message = "Success";
             }           
@@ -79,24 +82,21 @@ namespace ToysAndGames.Controllers
         }
 
         //-------------------------------------------------------------------------------------------------------------
-
-        [HttpPost("create")]
-        public ActionResult CreateProduct(
-            [FromBody] JsonElement product
-            )
+        [HttpGet("types")]
+        public ActionResult Types()
         {
             //Create Default response;
             var response = _response.Response();
 
-            var productModel = JsonSerializer.Deserialize<ProductModel>(product.ToString());
+            var productstypes = _producttyperepo.FindAll();
 
-            //Map to an object to be save to DB
-            var ProductToSave = _mapper.Map<ProductModel, ProductDataDictionary>(productModel);
-            var isSuccess = _productRepo.Create(ProductToSave);
-
-            response.Message = "Something went wrong creating the product";
-            if (isSuccess)
+            response.Message = "There are not records to show";
+            if (productstypes.Count > 0)
             {
+                //Map to model
+                var productstypeModel = _mapper.Map<List<ProductType>, List<ProductTypeModel>>(productstypes.ToList());
+                //Assign records to response.
+                response.Products = productstypeModel;
                 response.Message = "Success";
             }
 
@@ -106,34 +106,63 @@ namespace ToysAndGames.Controllers
 
         //-------------------------------------------------------------------------------------------------------------
 
+        [HttpPost("create")]
+        public ActionResult CreateProduct(
+            [FromBody] ProductModel product
+            )
+        {
+            //Create Default response;
+            var response = _response.Response();
+            //var json = product.ToString();
+
+            response.Message = "Invalid Information";
+            if (ModelState.IsValid)
+            {
+                //Map to an object to be save to DB
+                var ProductToSave = _mapper.Map<ProductModel, Product>(product);
+                var isSuccess = _productRepo.Create(ProductToSave);
+
+                response.Message = "Something went wrong creating the product";
+                if (isSuccess)
+                {
+                    response.Message = "Success";
+                }                
+            }
+
+            ActionResult result = base.Ok(response);
+            return result;
+
+        }
+
+        //-------------------------------------------------------------------------------------------------------------
+
         [HttpPut("update")]
         public ActionResult UpdateProduct(
-            [FromBody] JsonElement product
+            [FromBody] ProductModel product
             )
         {
             //Create Default response;
             var response = _response.Response();
 
-            var productModel = JsonSerializer.Deserialize<ProductModel>(product.ToString());
 
             response.Message = "Invalid Information";
             if (ModelState.IsValid)
             {
                 //Verify if the product to update exists
-                var ProductDB = _productRepo.FindById(productModel.Id);
+                var ProductDB = _productRepo.FindById(product.Id);
 
                 response.Message = "The product you are trying to update does not exists";
                 if (ProductDB != null)
                 {
                     //Update values
-                    ProductDB.Name = productModel.Name;
-                    ProductDB.Description = productModel.Description;
-                    ProductDB.AgeRestriction = productModel.AgeRestriction;
-                    ProductDB.Company = productModel.Company;
-                    ProductDB.Price = productModel.Price;
+                    ProductDB.Name = product.Name;
+                    ProductDB.Description = product.Description;
+                    ProductDB.AgeRestriction = product.AgeRestriction;
+                    ProductDB.Company = product.Company;
+                    ProductDB.Price = product.Price;
+                    ProductDB.ProductTypeId = product.ProductTypeId;
 
                     //Map to an object to be save to DB
-                    //var ProductToUpdate = _mapper.Map<ProductModel, ProductDataDictionary>(productModel);
                     var isSuccess = _productRepo.Update(ProductDB);
 
                     response.Message = "Something went wrong updating the product";

@@ -12,7 +12,8 @@ namespace ToysAndGames.Mappings
     {
         public Maps()
         {
-            CreateMap<ProductDataDictionary, ProductModel>().ReverseMap();
+            CreateMap<Product, ProductModel>().ReverseMap();
+            CreateMap<ProductType, ProductTypeModel>().ReverseMap();
         }
     }
 }

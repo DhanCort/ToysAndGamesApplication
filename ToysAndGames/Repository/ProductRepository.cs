@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,26 +17,28 @@ namespace ToysAndGames.Repository
             _db = db;
         }
 
-        public bool Create(ProductDataDictionary entity)
+        public bool Create(Product entity)
         {
             _db.Products.Add(entity);
             return Save();
         }
 
-        public bool Delete(ProductDataDictionary entity)
+        public bool Delete(Product entity)
         {
             _db.Products.Remove(entity);
             return Save();
         }
 
-        public ICollection<ProductDataDictionary> FindAll()
+        public ICollection<Product> FindAll()
         {
-            return _db.Products.ToList();
+            //return _db.Products.ToList();
+            return _db.Products.Include(q => q.ProductType).ToList();
+
         }
 
-        public ProductDataDictionary FindById(int id)
+        public Product FindById(int id)
         {
-            ProductDataDictionary product = _db.Products.Find(id);
+            Product product = _db.Products.Include(q => q.ProductType).Where(q => q.Id == id).FirstOrDefault();
             return product;
         }
 
@@ -45,7 +48,7 @@ namespace ToysAndGames.Repository
             return value > 0;
         }
 
-        public bool Update(ProductDataDictionary entity)
+        public bool Update(Product entity)
         {
             _db.Products.Update(entity);
             return Save();

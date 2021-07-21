@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using ToysAndGames.Data;
 
 namespace ToysAndGames.Models
 {
@@ -22,6 +23,9 @@ namespace ToysAndGames.Models
         [MaxLength(50)]
         public string Company { get; set; }
         [Required]
+        [Range(0,1000)]
         public decimal Price { get; set; }
+        public int ProductTypeId { get; set; }
+        public ProductType ProductType { get; set; }
     }
 }

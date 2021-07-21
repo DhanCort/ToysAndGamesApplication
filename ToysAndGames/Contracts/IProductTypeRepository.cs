@@ -6,8 +6,7 @@ using ToysAndGames.Data;
 
 namespace ToysAndGames.Contracts
 {
-    public interface IProductRepository : IBaseRepository<Product>
+    public interface IProductTypeRepository : IBaseRepository<ProductType>
     {
-
     }
 }

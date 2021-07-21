@@ -22,6 +22,7 @@ namespace ToysAndGamesTests
         private readonly Mock<IProductRepository> _productRepo;
         private readonly Mock<IMapper> _mapper;
         private readonly Mock<IResponse> _response;
+        private readonly Mock<IProductTypeRepository> _producttyperepo;
 
         public ProductsTest()
         {
@@ -29,8 +30,9 @@ namespace ToysAndGamesTests
             _productRepo = new Mock<IProductRepository>();
             _mapper = new Mock<IMapper>();
             _response = new Mock<IResponse>();
+            _producttyperepo = new Mock<IProductTypeRepository>();
 
-            _controller = new ProductController(_productRepo.Object, _mapper.Object, _response.Object);
+            _controller = new ProductController(_productRepo.Object, _mapper.Object, _response.Object, _producttyperepo.Object);
         }
 
         [Fact]
@@ -42,7 +44,7 @@ namespace ToysAndGamesTests
             _response.Setup(x => x.Response()).Returns(response);
 
             //Mocking of products.
-            var products = Mock.Of<List<ProductDataDictionary>>();
+            var products = Mock.Of<List<Product>>();
             _productRepo.Setup(x => x.FindAll()).Returns(products);
 
 
@@ -58,7 +60,7 @@ namespace ToysAndGamesTests
         {
             //Arrange
             //Mocking of response
-            var productMok = Mock.Of<ProductDataDictionary>();
+            var productMok = Mock.Of<Product>();
             var product = _productRepo.Setup(x => x.FindById(1)).Returns(productMok);
 
             var response = Mock.Of<ResponseModel>(x => x.Status == 200 && x.Message == "Success" && x.Products == product);
@@ -76,7 +78,7 @@ namespace ToysAndGamesTests
         {
             //Arrange
             //Mocking of response
-            var productMoq = Mock.Of<ProductDataDictionary>(x => x.AgeRestriction == 12 && x.Company == "Mattel" && x.Description == "Something" &&
+            var productMoq = Mock.Of<Product>(x => x.AgeRestriction == 12 && x.Company == "Mattel" && x.Description == "Something" &&
                 x.Id == 1 && x.Name == "Black Phanter" && x.Price == 125);
             var product = _productRepo.Setup(x => x.FindById(1)).Returns(productMoq);
 
@@ -85,7 +87,7 @@ namespace ToysAndGamesTests
 
             //Mapper Mock
             var ProductModel = Mock.Of<ProductModel>();
-            _mapper.Setup(x => x.Map<ProductDataDictionary, ProductModel>(productMoq)).Returns(ProductModel);
+            _mapper.Setup(x => x.Map<Product, ProductModel>(productMoq)).Returns(ProductModel);
 
             //Act
             var result = _controller.Product(1);
@@ -99,7 +101,7 @@ namespace ToysAndGamesTests
         public void Delete_GivenAValidId_ReturnSuccessMessage()
         {
             //Mock of product to delete
-            var productMoq = Mock.Of<ProductDataDictionary>(x => x.AgeRestriction == 12 && x.Company == "Mattel" && x.Description == "Something" &&
+            var productMoq = Mock.Of<Product>(x => x.AgeRestriction == 12 && x.Company == "Mattel" && x.Description == "Something" &&
                 x.Id == 1 && x.Name == "Black Phanter" && x.Price == 125);
             var product = _productRepo.Setup(x => x.FindById(1)).Returns(productMoq);
 
@@ -120,7 +122,7 @@ namespace ToysAndGamesTests
         public void Delete_GivenInvalidIdReturnProductNotFoundMessage()
         {
             //Mock of product to delete
-            var productMoq = Mock.Of<ProductDataDictionary>();
+            var productMoq = Mock.Of<Product>();
             productMoq = null;
             var product = _productRepo.Setup(x => x.FindById(1)).Returns(productMoq);
 

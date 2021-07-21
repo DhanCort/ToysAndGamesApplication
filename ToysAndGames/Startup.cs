@@ -47,8 +47,10 @@ namespace ToysAndGames
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
+            // Dependency Injection
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IResponse, ResponseRepository>();
+            services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -81,7 +83,7 @@ namespace ToysAndGames
                 .AllowAnyHeader()
             );
 
-            SeedData.Seed(productrepo);
+            //SeedData.Seed(productrepo);
 
             app.UseEndpoints(endpoints =>
             {
